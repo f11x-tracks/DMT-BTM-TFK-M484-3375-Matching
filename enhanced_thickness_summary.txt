@@ -1,0 +1,44 @@
+ENHANCED THICKNESS COMPARISON ANALYSIS SUMMARY
+============================================================
+
+Generated on: 2026-03-26 14:54:27
+Analysis Date: March 26, 2026
+
+BASIC STATISTICS
+------------------------------
+Total matched measurement pairs: 248
+Unique wafers analyzed: 8
+Wafer IDs: AANBD159TED5, AANBD160TEG6, AANBD182TEC1, AANBD183TEG3, AANBD202TEC1, AANBD204TED2, AANBD216TEB4, AANBD252TEC4
+
+Mean thickness difference (DMT - TFK): -29.010 ± 9.221 Å
+Median thickness difference: -27.945 Å
+Range: -58.421 to -13.716 Å
+95% of differences within: ±18.073 Å
+
+TOOL COMPARISON
+------------------------------
+DMT Tool - Mean: 3346.636 Å, Std: 10.538 Å
+TFK Tool - Mean: 3375.646 Å, Std: 9.335 Å
+Tool bias (DMT - TFK): -29.010 Å
+Precision difference (DMT std - TFK std): 1.204 Å
+
+COORDINATE MATCHING QUALITY
+------------------------------
+Average matching distance: 1.403 ± 0.565 mm
+Matches within 0.5mm: 8/248 (3.2%)
+Matches within 1.0mm: 40/248 (16.1%)
+Maximum matching distance: 3.662 mm
+
+SPATIAL ANALYSIS SUMMARY
+------------------------------
+Spatial grid resolution: 50x50
+Bins with data: 31/2500 (1.2%)
+Spatial coverage: X=[-135.6, 141.7]mm, Y=[-135.6, 135.6]mm
+
+KEY FINDINGS
+------------------------------
+⚠ Systematic bias detected: TFK reads higher by 29.0 Å
+✓ Good precision matching between tools
+✓ Good relative precision
+
+Coefficient of variation: 31.8%
