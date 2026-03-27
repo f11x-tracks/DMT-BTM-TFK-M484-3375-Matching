@@ -1,5 +1,8 @@
 run
 thickness_comparison_app - to create data used for other apps
+run 
+btm_dmt and btm_tfk comparisons
+run wafer_map_analys and wafer_map_analysis_contour
 
 # Thickness Measurement Comparison System
 

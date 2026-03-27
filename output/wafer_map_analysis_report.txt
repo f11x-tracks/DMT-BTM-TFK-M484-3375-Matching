@@ -23,11 +23,11 @@ DMT-TFK - Top 5 Highest Delta Locations:
   (  57.0, -135.0) mm:   -44.0 ±   4.2 Å
 
 BTM-DMT - Top 5 Highest Delta Locations:
-  (-135.7,  -57.4) mm:    25.0 ±   2.3 Å
-  (-135.7,   57.4) mm:    24.9 ±   1.8 Å
-  ( -57.4,  135.7) mm:    24.3 ±   2.0 Å
-  ( -57.4, -135.7) mm:    24.0 ±   1.8 Å
-  (  57.4, -135.7) mm:    21.9 ±   1.5 Å
+  (-136.2,   57.9) mm:    44.7 ±   6.2 Å
+  (-136.2,  -57.9) mm:    43.9 ±   4.4 Å
+  ( -57.9, -136.2) mm:    43.0 ±   5.1 Å
+  ( -57.9,  136.2) mm:    42.5 ±   6.0 Å
+  (  57.9, -136.2) mm:    41.5 ±   5.2 Å
 
 BTM-TFK - Top 5 Highest Delta Locations:
   ( 141.9,  -35.9) mm:    -9.1 ±   9.0 Å
@@ -40,14 +40,14 @@ TOOL STATISTICS BY WAFER:
 ----------------------------------------
 
 BTM Tool:
-  AANBD159TED5:  3352.7 ±   5.4 Å (31 points)
-  AANBD160TEG6:  3353.3 ±   5.6 Å (31 points)
-  AANBD182TEC1:  3366.1 ±   4.7 Å (31 points)
-  AANBD183TEG3:  3374.6 ±   6.9 Å (31 points)
-  AANBD202TEC1:  3363.7 ±   5.0 Å (31 points)
-  AANBD204TED2:  3372.7 ±   6.9 Å (31 points)
-  AANBD216TEB4:  3373.9 ±   6.8 Å (31 points)
-  AANBD252TEC4:  3371.4 ±   7.0 Å (31 points)
+  AANBD159TED5:  3355.3 ±   7.5 Å (31 points)
+  AANBD160TEG6:  3355.8 ±   7.5 Å (31 points)
+  AANBD182TEC1:  3371.4 ±  12.4 Å (31 points)
+  AANBD183TEG3:  3381.7 ±   7.6 Å (31 points)
+  AANBD202TEC1:  3367.5 ±  12.1 Å (31 points)
+  AANBD204TED2:  3379.7 ±   7.3 Å (31 points)
+  AANBD216TEB4:  3381.1 ±   7.6 Å (31 points)
+  AANBD252TEC4:  3378.6 ±   7.4 Å (31 points)
 
 DMT Tool:
   AANBD159TED5:  3334.2 ±   5.8 Å (31 points)

@@ -1,0 +1,89 @@
+================================================================================
+WAFER MAP ANALYSIS SUMMARY REPORT - RADIAL SPLINE VERSION
+================================================================================
+
+DATASET OVERVIEW:
+----------------------------------------
+DMT-TFK Comparisons: 248 matched pairs
+  Wafers: AANBD159TED5, AANBD160TEG6, AANBD182TEC1, AANBD183TEG3, AANBD202TEC1, AANBD204TED2, AANBD216TEB4, AANBD252TEC4
+BTM-DMT Comparisons: 248 matched pairs
+  Wafers: AANBD159TED5, AANBD160TEG6, AANBD182TEC1, AANBD183TEG3, AANBD202TEC1, AANBD204TED2, AANBD216TEB4, AANBD252TEC4
+BTM-TFK Comparisons: 256 matched pairs
+  Wafers: AANBD159TED5, AANBD160TEG6, AANBD182TEC1, AANBD183TEG3, AANBD202TEC1, AANBD204TED2, AANBD216TEB4, AANBD252TEC4
+
+LOCATION ANALYSIS:
+----------------------------------------
+Total measurement locations analyzed: 94
+
+DMT-TFK - Top 5 Highest Delta Locations:
+  (-135.0,   57.0) mm:   -49.1 ±   7.8 Å
+  ( -57.0,  135.0) mm:   -47.8 ±   8.2 Å
+  (-135.0,  -57.0) mm:   -47.1 ±   7.3 Å
+  ( -57.0, -135.0) mm:   -46.5 ±   4.8 Å
+  (  57.0, -135.0) mm:   -44.0 ±   4.2 Å
+
+BTM-DMT - Top 5 Highest Delta Locations:
+  (-136.2,   57.9) mm:    44.7 ±   6.2 Å
+  (-136.2,  -57.9) mm:    43.9 ±   4.4 Å
+  ( -57.9, -136.2) mm:    43.0 ±   5.1 Å
+  ( -57.9,  136.2) mm:    42.5 ±   6.0 Å
+  (  57.9, -136.2) mm:    41.5 ±   5.2 Å
+
+BTM-TFK - Top 5 Highest Delta Locations:
+  ( 141.9,  -35.9) mm:    -9.1 ±   9.0 Å
+  (  71.2,  127.4) mm:    -5.7 ±   8.6 Å
+  (   0.0, -134.7) mm:    -5.6 ±   7.2 Å
+  ( -96.5,   96.5) mm:    -5.5 ±   7.9 Å
+  (  96.5,  -96.5) mm:    -5.3 ±   8.0 Å
+
+TOOL STATISTICS BY WAFER:
+----------------------------------------
+
+BTM Tool:
+  AANBD159TED5:  3355.3 ±   7.5 Å (31 points)
+  AANBD160TEG6:  3355.8 ±   7.5 Å (31 points)
+  AANBD182TEC1:  3371.4 ±  12.4 Å (31 points)
+  AANBD183TEG3:  3381.7 ±   7.6 Å (31 points)
+  AANBD202TEC1:  3367.5 ±  12.1 Å (31 points)
+  AANBD204TED2:  3379.7 ±   7.3 Å (31 points)
+  AANBD216TEB4:  3381.1 ±   7.6 Å (31 points)
+  AANBD252TEC4:  3378.6 ±   7.4 Å (31 points)
+
+DMT Tool:
+  AANBD159TED5:  3334.2 ±   5.8 Å (31 points)
+  AANBD160TEG6:  3334.1 ±   6.6 Å (31 points)
+  AANBD182TEC1:  3346.3 ±   5.5 Å (31 points)
+  AANBD183TEG3:  3354.7 ±   6.9 Å (31 points)
+  AANBD202TEC1:  3344.1 ±   5.6 Å (31 points)
+  AANBD204TED2:  3353.2 ±   8.0 Å (31 points)
+  AANBD216TEB4:  3354.4 ±   7.5 Å (31 points)
+  AANBD252TEC4:  3352.1 ±   8.4 Å (31 points)
+
+TFK Tool:
+  AANBD159TED5:  3366.3 ±   8.1 Å (31 points)
+  AANBD160TEG6:  3367.1 ±   8.3 Å (31 points)
+  AANBD182TEC1:  3380.4 ±   7.9 Å (31 points)
+  AANBD183TEG3:  3379.7 ±   7.7 Å (31 points)
+  AANBD202TEC1:  3378.0 ±   8.3 Å (31 points)
+  AANBD204TED2:  3377.7 ±   7.0 Å (31 points)
+  AANBD216TEB4:  3379.0 ±   7.7 Å (31 points)
+  AANBD252TEC4:  3376.9 ±   7.5 Å (31 points)
+
+RADIAL SPLINE PLOT FEATURES:
+----------------------------------------
+• X-axis: Radius from wafer center (0-150 mm)
+• Y-axis: Thickness values or delta values
+• Raw data points shown as light colored scatter
+• Binned averages (5mm bins) with error bars as diamonds
+• Spline fits showing smooth radial trends
+• Separate plots for each tool and delta analysis
+• Zero reference line for corrected delta plots
+
+COORDINATE SYSTEM NOTES:
+----------------------------------------
+• Each tool uses its own native coordinate system for radius calculation
+• TFK plots use TFK coordinates when available
+• Radius calculated as sqrt(x² + y²) from wafer center
+• Different tool comparisons may show different radial coverage
+
+================================================================================

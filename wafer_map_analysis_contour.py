@@ -486,17 +486,42 @@ class WaferMapAnalysis:
             )
         
         # Plot 5: Offset-corrected delta contour map
-        xi, yi, zi_corrected = self.create_contour_grid(x_data, y_data, data['Corrected_Delta'])
+        # Aggregate duplicate coordinates by averaging corrected delta values
+        corrected_delta_df = pd.DataFrame({
+            'x': x_data,
+            'y': y_data,
+            'corrected_delta': data['Corrected_Delta']
+        })
+        corrected_delta_aggregated = corrected_delta_df.groupby(['x', 'y'])['corrected_delta'].mean().reset_index()
+        corrected_x_data = corrected_delta_aggregated['x']
+        corrected_y_data = corrected_delta_aggregated['y']
+        corrected_delta_data = corrected_delta_aggregated['corrected_delta']
+        print(f"  Corrected delta coordinates aggregated: {len(data)} -> {len(corrected_delta_aggregated)} unique locations")
+        
+        xi, yi, zi_corrected = self.create_contour_grid(corrected_x_data, corrected_y_data, corrected_delta_data)
+        
+        # Calculate symmetric range around zero for proper positive/negative visualization
+        max_abs_corrected = max(abs(corrected_delta_data.min()), abs(corrected_delta_data.max()))
+        
         fig.add_trace(
             go.Contour(
                 x=xi,
                 y=yi,
                 z=zi_corrected,
                 colorscale='RdBu_r',
-                colorbar=dict(title="Corrected Delta (Å)", x=0.97, len=0.4, y=0.225),
+                zmid=0,  # Center the colorscale at zero
+                zmin=-max_abs_corrected,  # Symmetric range
+                zmax=max_abs_corrected,   # Symmetric range
+                colorbar=dict(
+                    title="Corrected Delta (Å)<br><span style='font-size:8px'>Red=Positive<br>Blue=Negative</span>", 
+                    x=0.97, len=0.4, y=0.225
+                ),
                 contours=dict(
                     showlabels=True,
-                    labelfont=dict(size=8, color='black')
+                    labelfont=dict(size=8, color='white'),
+                    start=-max_abs_corrected,
+                    end=max_abs_corrected,
+                    size=max_abs_corrected/5  # Create ~10 contour levels
                 ),
                 hovertemplate=f'<b>X: %{{x:.1f}} mm, Y: %{{y:.1f}} mm</b><br>' +
                              'Corrected Delta: %{z:.1f} Å<extra></extra>',
@@ -509,16 +534,14 @@ class WaferMapAnalysis:
         # Add scatter points overlay for reference
         fig.add_trace(
             go.Scatter(
-                x=data[x_col],
-                y=data[y_col],
+                x=corrected_x_data,
+                y=corrected_y_data,
                 mode='markers',
                 marker=dict(size=3, color='white', opacity=0.7, line=dict(width=0.5, color='black')),
-                text=data['Corrected_Delta'].round(1),
-                customdata=data['Thickness_Delta'].round(1),
+                text=corrected_delta_data.round(1),
                 hovertemplate=f'<b>Measurement Point</b><br>' +
                              f'X: %{{x:.1f}} mm, Y: %{{y:.1f}} mm<br>' +
-                             'Corrected Delta: %{text} Å<br>' +
-                             'Original Delta: %{customdata} Å<extra></extra>',
+                             'Corrected Delta: %{text} Å<extra></extra>',
                 name='Measurement Points',
                 showlegend=False
             ),
