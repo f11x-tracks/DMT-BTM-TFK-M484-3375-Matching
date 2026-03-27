@@ -246,7 +246,10 @@ class ThicknessComparisonApp:
             return
         
         if output_dir is None:
-            output_dir = os.path.dirname(os.path.abspath(__file__))
+            output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        
+        # Create output directory
+        os.makedirs(output_dir, exist_ok=True)
         
         # Set up matplotlib parameters
         plt.style.use('default')
@@ -640,7 +643,7 @@ class ThicknessComparisonApp:
                 print(f"\n{rank_name.replace('_', ' ').upper()}:")
                 print(rank_data.to_string(index=False))
         
-        # Create rankings directory
+        # Create output directory for rankings
         rankings_dir = os.path.join(output_dir, 'rankings')
         os.makedirs(rankings_dir, exist_ok=True)
         
@@ -661,7 +664,10 @@ class ThicknessComparisonApp:
     def create_enhanced_summary(self, output_dir=None):
         """Create comprehensive summary report with wafer map and ranking results"""
         if output_dir is None:
-            output_dir = os.path.dirname(os.path.abspath(__file__))
+            output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        
+        # Create output directory
+        os.makedirs(output_dir, exist_ok=True)
         
         summary_file = os.path.join(output_dir, 'enhanced_thickness_summary.txt')
         
@@ -812,7 +818,10 @@ class ThicknessComparisonApp:
             return
         
         if output_dir is None:
-            output_dir = os.path.dirname(os.path.abspath(__file__))
+            output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        
+        # Create output directory
+        os.makedirs(output_dir, exist_ok=True)
         
         # Use average coordinates for site identification
         site_data = self.matched_data.copy()
@@ -859,7 +868,10 @@ class ThicknessComparisonApp:
     def save_results(self, output_dir=None):
         """Save analysis results to files"""
         if output_dir is None:
-            output_dir = os.path.dirname(os.path.abspath(__file__))
+            output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'output')
+        
+        # Create output directory
+        os.makedirs(output_dir, exist_ok=True)
         
         # Save detailed matched data
         if self.matched_data is not None and len(self.matched_data) > 0:

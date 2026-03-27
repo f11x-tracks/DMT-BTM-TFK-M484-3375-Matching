@@ -29,10 +29,10 @@ class WaferMapAnalysis:
         
         # Load DMT-TFK comparison (main matched data)
         try:
-            self.dmt_tfk_data = pd.read_csv('matched_thickness_data.csv')
+            self.dmt_tfk_data = pd.read_csv('output/matched_thickness_data.csv')
             print(f"Loaded {len(self.dmt_tfk_data)} DMT-TFK matched pairs")
         except FileNotFoundError:
-            print("Warning: matched_thickness_data.csv not found")
+            print("Warning: output/matched_thickness_data.csv not found")
             
         # Load BTM-DMT comparison
         try:
@@ -131,7 +131,8 @@ class WaferMapAnalysis:
         self.location_summary = pd.DataFrame(location_data)
         
         # Save to CSV
-        self.location_summary.to_csv('location_delta_summary.csv', index=False)
+        Path('output').mkdir(exist_ok=True)
+        self.location_summary.to_csv('output/location_delta_summary.csv', index=False)
         print(f"Location summary saved with {len(self.location_summary)} entries")
         
         return self.location_summary
@@ -206,29 +207,36 @@ class WaferMapAnalysis:
         pivot_summary = pivot_summary.reset_index()
         
         # Save to CSV
-        self.tool_wafer_summary.to_csv('tool_wafer_summary.csv', index=False)
-        pivot_summary.to_csv('tool_wafer_summary_pivot.csv', index=False)
+        Path('output').mkdir(exist_ok=True)
+        self.tool_wafer_summary.to_csv('output/tool_wafer_summary.csv', index=False)
+        pivot_summary.to_csv('output/tool_wafer_summary_pivot.csv', index=False)
         
         print(f"Tool-wafer summary saved with {len(self.tool_wafer_summary)} entries")
         
         return self.tool_wafer_summary, pivot_summary
     
     def create_wafer_map_plot(self, comparison_type='DMT-TFK', save_plots=True):
-        """Create wafer map showing delta values with highlighting of highest deltas"""
+        """Create wafer map showing mean thickness values and delta analysis"""
         
         # Filter data for the requested comparison
         if comparison_type == 'DMT-TFK' and self.dmt_tfk_data is not None:
             data = self.dmt_tfk_data.copy()
             x_col, y_col = 'DMT_X_mm', 'DMT_Y_mm'
             title_prefix = "DMT-TFK"
+            tool1_col, tool2_col = 'DMT_Thickness', 'TFK_Thickness'
+            tool1_name, tool2_name = 'DMT', 'TFK'
         elif comparison_type == 'BTM-DMT' and self.btm_dmt_data is not None:
             data = self.btm_dmt_data.copy()
             x_col, y_col = 'BTM_X_mm', 'BTM_Y_mm'
             title_prefix = "BTM-DMT"
+            tool1_col, tool2_col = 'BTM_Thickness', 'DMT_Thickness'
+            tool1_name, tool2_name = 'BTM', 'DMT'
         elif comparison_type == 'BTM-TFK' and self.btm_tfk_data is not None:
             data = self.btm_tfk_data.copy()
             x_col, y_col = 'BTM_X_mm', 'BTM_Y_mm'
             title_prefix = "BTM-TFK"
+            tool1_col, tool2_col = 'BTM_Thickness', 'TFK_Thickness'
+            tool1_name, tool2_name = 'BTM', 'TFK'
         else:
             print(f"No data available for {comparison_type} comparison")
             return None
@@ -236,61 +244,90 @@ class WaferMapAnalysis:
         # Calculate absolute delta for highlighting
         data['Abs_Delta'] = abs(data['Thickness_Delta'])
         
-        # Find locations with highest deltas (top 10%)
-        threshold = data['Abs_Delta'].quantile(0.9)
-        data['High_Delta'] = data['Abs_Delta'] >= threshold
+        # Calculate average offset between tools
+        avg_offset = data['Thickness_Delta'].mean()
+        data['Corrected_Delta'] = data['Thickness_Delta'] - avg_offset
+        data['Abs_Corrected_Delta'] = abs(data['Corrected_Delta'])
+        
+        # Aggregate duplicate coordinates to avoid overlapping points in scatter plots
+        # This ensures each spatial location is represented by a single point showing mean values
+        coord_cols = [x_col, y_col]
+        aggregated_data = data.groupby(coord_cols).agg({
+            tool1_col: 'mean',
+            tool2_col: 'mean', 
+            'Thickness_Delta': 'mean',
+            'Abs_Delta': 'mean',
+            'Corrected_Delta': 'mean',
+            'Abs_Corrected_Delta': 'mean'
+        }).reset_index()
+        
+        # Find locations with highest deltas (top 10%) based on aggregated data
+        threshold = aggregated_data['Abs_Delta'].quantile(0.9)
+        aggregated_data['High_Delta'] = aggregated_data['Abs_Delta'] >= threshold
+        
+        print(f"\nCoordinate aggregation applied: {len(data)} -> {len(aggregated_data)} unique locations")
+        
+        print(f"\n{title_prefix} Average Offset: {avg_offset:.2f} Å ({tool1_name} - {tool2_name})")
+        if avg_offset > 0:
+            print(f"  → {tool1_name} measures {avg_offset:.2f} Å higher on average")
+        else:
+            print(f"  → {tool2_name} measures {abs(avg_offset):.2f} Å higher on average")
         
         # Create subplots
         fig = make_subplots(
-            rows=2, cols=2,
+            rows=2, cols=3,
             subplot_titles=(
-                f'{title_prefix} Delta Wafer Map',
-                f'{title_prefix} Absolute Delta Map',
+                f'{tool1_name} Mean Thickness Wafer Map',
+                f'{tool2_name} Mean Thickness Wafer Map',
                 f'{title_prefix} Delta Distribution',
-                f'{title_prefix} High Delta Locations'
+                f'{title_prefix} High Delta Locations',
+                f'{title_prefix} Offset-Corrected Delta Map',
+                f'Offset: {avg_offset:.2f} Å'
             ),
-            specs=[[{"secondary_y": False}, {"secondary_y": False}],
-                   [{"secondary_y": False}, {"secondary_y": False}]]
+            specs=[[{"secondary_y": False}, {"secondary_y": False}, {"secondary_y": False}],
+                   [{"secondary_y": False}, {"secondary_y": False}, {"secondary_y": False}]]
         )
         
-        # Plot 1: Delta wafer map (signed delta)
+        # Plot 1: Tool 1 mean thickness wafer map
         fig.add_trace(
             go.Scatter(
-                x=data[x_col],
-                y=data[y_col],
+                x=aggregated_data[x_col],
+                y=aggregated_data[y_col],
                 mode='markers',
                 marker=dict(
                     size=8,
-                    color=data['Thickness_Delta'],
-                    colorscale='RdBu_r',
-                    colorbar=dict(title="Delta (Å)", x=0.46),
+                    color=aggregated_data[tool1_col],
+                    colorscale='Viridis',
+                    colorbar=dict(title=f"{tool1_name} Thickness (Å)", x=0.31),
                     line=dict(width=1, color='black')
                 ),
-                text=data['Thickness_Delta'].round(1),
+                text=aggregated_data[tool1_col].round(1),
                 hovertemplate=f'<b>X: %{{x:.1f}} mm, Y: %{{y:.1f}} mm</b><br>' +
-                             'Delta: %{text} Å<extra></extra>',
-                name='Delta Map'
+                             f'{tool1_name} Mean Thickness: %{{text}} Å<extra></extra>',
+                name=f'{tool1_name} Thickness',
+                showlegend=False
             ),
             row=1, col=1
         )
         
-        # Plot 2: Absolute delta map
+        # Plot 2: Tool 2 mean thickness wafer map
         fig.add_trace(
             go.Scatter(
-                x=data[x_col],
-                y=data[y_col],
+                x=aggregated_data[x_col],
+                y=aggregated_data[y_col],
                 mode='markers',
                 marker=dict(
                     size=8,
-                    color=data['Abs_Delta'],
-                    colorscale='Reds',
-                    colorbar=dict(title="Abs Delta (Å)", x=1.02),
+                    color=aggregated_data[tool2_col],
+                    colorscale='Plasma',
+                    colorbar=dict(title=f"{tool2_name} Thickness (Å)", x=0.64),
                     line=dict(width=1, color='black')
                 ),
-                text=data['Abs_Delta'].round(1),
+                text=aggregated_data[tool2_col].round(1),
                 hovertemplate=f'<b>X: %{{x:.1f}} mm, Y: %{{y:.1f}} mm</b><br>' +
-                             'Abs Delta: %{text} Å<extra></extra>',
-                name='Abs Delta Map'
+                             f'{tool2_name} Mean Thickness: %{{text}} Å<extra></extra>',
+                name=f'{tool2_name} Thickness',
+                showlegend=False
             ),
             row=1, col=2
         )
@@ -302,14 +339,15 @@ class WaferMapAnalysis:
                 nbinsx=50,
                 name='Delta Distribution',
                 marker_color='lightblue',
-                opacity=0.7
+                opacity=0.7,
+                showlegend=False
             ),
-            row=2, col=1
+            row=1, col=3
         )
         
         # Plot 4: Highlight highest delta locations
-        normal_points = data[~data['High_Delta']]
-        high_delta_points = data[data['High_Delta']]
+        normal_points = aggregated_data[~aggregated_data['High_Delta']]
+        high_delta_points = aggregated_data[aggregated_data['High_Delta']]
         
         # Normal points
         fig.add_trace(
@@ -318,31 +356,83 @@ class WaferMapAnalysis:
                 y=normal_points[y_col],
                 mode='markers',
                 marker=dict(size=6, color='lightgray', opacity=0.6),
+                text=normal_points['Thickness_Delta'].round(1),
+                hovertemplate=f'<b>X: %{{x:.1f}} mm, Y: %{{y:.1f}} mm</b><br>' +
+                             'Mean Delta: %{text} Å<extra></extra>',
                 name='Normal Delta',
+                showlegend=False
+            ),
+            row=2, col=1
+        )
+        
+        # High delta points
+        if len(high_delta_points) > 0:
+            fig.add_trace(
+                go.Scatter(
+                    x=high_delta_points[x_col],
+                    y=high_delta_points[y_col],
+                    mode='markers',
+                    marker=dict(
+                        size=10,
+                        color=high_delta_points['Thickness_Delta'],
+                        colorscale='RdBu_r',
+                        line=dict(width=2, color='black')
+                    ),
+                    text=high_delta_points['Thickness_Delta'].round(1),
+                    hovertemplate=f'<b>HIGH DELTA LOCATION</b><br>' +
+                                 f'X: %{{x:.1f}} mm, Y: %{{y:.1f}} mm<br>' +
+                                 'Mean Delta: %{text} Å<extra></extra>',
+                    name=f'High Delta (|Δ|>{threshold:.1f} Å)'
+                ),
+                row=2, col=1
+            )
+        
+        # Plot 5: Offset-corrected delta wafer map
+        fig.add_trace(
+            go.Scatter(
+                x=aggregated_data[x_col],
+                y=aggregated_data[y_col],
+                mode='markers',
+                marker=dict(
+                    size=8,
+                    color=aggregated_data['Corrected_Delta'],
+                    colorscale='RdBu_r',
+                    colorbar=dict(title="Corrected Delta (Å)", x=0.97),
+                    line=dict(width=1, color='black')
+                ),
+                text=aggregated_data['Corrected_Delta'].round(1),
+                customdata=aggregated_data['Thickness_Delta'].round(1),
+                hovertemplate=f'<b>X: %{{x:.1f}} mm, Y: %{{y:.1f}} mm</b><br>' +
+                             'Mean Corrected Delta: %{text} Å<br>' +
+                             'Mean Original Delta: %{customdata} Å<extra></extra>',
+                name='Offset Corrected',
                 showlegend=False
             ),
             row=2, col=2
         )
         
-        # High delta points
+        # Plot 6: Offset correction statistics text
+        corrected_std = aggregated_data['Corrected_Delta'].std()
+        original_std = aggregated_data['Thickness_Delta'].std()
+        
         fig.add_trace(
             go.Scatter(
-                x=high_delta_points[x_col],
-                y=high_delta_points[y_col],
-                mode='markers',
-                marker=dict(
-                    size=10,
-                    color=high_delta_points['Abs_Delta'],
-                    colorscale='Reds',
-                    line=dict(width=2, color='black')
-                ),
-                text=high_delta_points['Abs_Delta'].round(1),
-                hovertemplate=f'<b>HIGH DELTA LOCATION</b><br>' +
-                             f'X: %{{x:.1f}} mm, Y: %{{y:.1f}} mm<br>' +
-                             'Abs Delta: %{text} Å<extra></extra>',
-                name=f'High Delta (>{threshold:.1f} Å)'
+                x=[0.5],
+                y=[0.5],
+                mode='text',
+                text=[f'<b>Offset Correction Analysis</b><br><br>' +
+                     f'Average Offset: {avg_offset:.2f} Å<br>' +
+                     f'Original Std Dev: {original_std:.2f} Å<br>' +
+                     f'Corrected Std Dev: {corrected_std:.2f} Å<br>' +
+                     f'Improvement: {((original_std-corrected_std)/original_std*100):.1f}%<br><br>' +
+                     f'After offset correction:<br>' +
+                     f'• Mean delta ≈ 0.00 Å<br>' +
+                     f'• Reduces systematic bias<br>' +
+                     f'• Shows remaining variation'],
+                textfont=dict(size=12),
+                showlegend=False
             ),
-            row=2, col=2
+            row=2, col=3
         )
         
         # Update layout
@@ -350,27 +440,45 @@ class WaferMapAnalysis:
         fig.update_yaxes(title="Y Position (mm)", row=1, col=1)
         fig.update_xaxes(title="X Position (mm)", row=1, col=2)
         fig.update_yaxes(title="Y Position (mm)", row=1, col=2)
-        fig.update_xaxes(title="Delta (Å)", row=2, col=1)
-        fig.update_yaxes(title="Count", row=2, col=1)
+        fig.update_xaxes(title="Delta (Å)", row=1, col=3)
+        fig.update_yaxes(title="Count", row=1, col=3)
+        fig.update_xaxes(title="X Position (mm)", row=2, col=1)
+        fig.update_yaxes(title="Y Position (mm)", row=2, col=1)
         fig.update_xaxes(title="X Position (mm)", row=2, col=2)
         fig.update_yaxes(title="Y Position (mm)", row=2, col=2)
         
+        # Hide axes for text plot
+        fig.update_xaxes(showticklabels=False, showgrid=False, zeroline=False, row=2, col=3)
+        fig.update_yaxes(showticklabels=False, showgrid=False, zeroline=False, row=2, col=3)
+        
         # Set equal aspect ratio for wafer maps
         for row in [1, 2]:
-            for col in [1, 2]:
-                if row == 2 and col == 1:  # Skip histogram
+            for col in [1, 2, 3]:
+                if (row == 1 and col == 3) or (row == 2 and col == 3):  # Skip histogram and text
                     continue
                 fig.update_xaxes(scaleanchor="y", scaleratio=1, row=row, col=col)
         
         fig.update_layout(
             height=800,
-            title=f'{title_prefix} Thickness Comparison - Wafer Map Analysis',
-            showlegend=True
+            width=1400,
+            title=f'{title_prefix} Thickness and Delta Analysis - Wafer Maps (Avg Offset: {avg_offset:.2f} Å)',
+            showlegend=True,
+            legend=dict(
+                x=1.02,
+                y=0.5,
+                xanchor='left',
+                yanchor='middle',
+                bgcolor='rgba(255,255,255,0.8)',
+                bordercolor='rgba(0,0,0,0.2)',
+                borderwidth=1,
+                font=dict(size=10)
+            )
         )
         
         if save_plots:
-            fig.write_html(f'{comparison_type.lower().replace("-", "_")}_wafer_map.html')
-            print(f"Wafer map saved as {comparison_type.lower().replace('-', '_')}_wafer_map.html")
+            Path('output').mkdir(exist_ok=True)
+            fig.write_html(f'output/{comparison_type.lower().replace("-", "_")}_wafer_map.html')
+            print(f"Wafer map saved as output/{comparison_type.lower().replace('-', '_')}_wafer_map.html")
         
         return fig
     
@@ -428,10 +536,11 @@ class WaferMapAnalysis:
         report.append("="*80)
         
         # Save report
-        with open('wafer_map_analysis_report.txt', 'w') as f:
+        Path('output').mkdir(exist_ok=True)
+        with open('output/wafer_map_analysis_report.txt', 'w') as f:
             f.write('\n'.join(report))
         
-        print("Summary report saved as wafer_map_analysis_report.txt")
+        print("Summary report saved as output/wafer_map_analysis_report.txt")
         return '\n'.join(report)
 
 def main():
@@ -472,11 +581,10 @@ def main():
     
     print("\nWafer Map Analysis Complete!")
     print("\nGenerated files:")
-    print("  - location_delta_summary.csv          (X,Y location delta summary)")
-    print("  - tool_wafer_summary.csv             (Tool statistics by wafer)")
-    print("  - tool_wafer_summary_pivot.csv       (Tool statistics - pivot format)")
-    print("  - *_wafer_map.html                   (Interactive wafer maps)")
-    print("  - wafer_map_analysis_report.txt      (Comprehensive summary report)")
-
+    print("  - output/location_delta_summary.csv          (X,Y location delta summary)")
+    print("  - output/tool_wafer_summary.csv             (Tool statistics by wafer)")
+    print("  - output/tool_wafer_summary_pivot.csv       (Tool statistics - pivot format)")
+    print("  - output/*_wafer_map.html                   (Interactive wafer maps)")
+    print("  - output/wafer_map_analysis_report.txt      (Comprehensive summary report)")
 if __name__ == "__main__":
     main()

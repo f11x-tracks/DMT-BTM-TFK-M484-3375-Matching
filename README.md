@@ -1,3 +1,6 @@
+run
+thickness_comparison_app - to create data used for other apps
+
 # Thickness Measurement Comparison System
 
 A comprehensive tool for comparing thickness measurements between different measurement tools: DMT, BTM, and TFK.
