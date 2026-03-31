@@ -139,11 +139,14 @@ class WaferMapAnalysis:
     
     def create_tool_wafer_summary(self):
         """Create summary table with average and std dev for each tool by wafer"""
-        tool_data = []
         
-        # Process DMT-TFK data for tool statistics
+        # Dictionary to store measurements for each tool-wafer combination
+        # Key: (WaferID, Tool), Value: list of (mean, std, count) tuples
+        tool_measurements = {}
+        
+        # Process DMT-TFK data for both DMT and TFK statistics
         if self.dmt_tfk_data is not None:
-            # DMT statistics by wafer
+            # DMT statistics by wafer from DMT-TFK data
             dmt_stats = self.dmt_tfk_data.groupby('WaferID').agg({
                 'DMT_Thickness': ['mean', 'std', 'count']
             }).round(2)
@@ -151,15 +154,12 @@ class WaferMapAnalysis:
             dmt_stats = dmt_stats.reset_index()
             
             for _, row in dmt_stats.iterrows():
-                tool_data.append({
-                    'WaferID': row['WaferID'],
-                    'Tool': 'DMT',
-                    'Mean_Thickness': row['Mean_Thickness'],
-                    'Std_Thickness': row['Std_Thickness'],
-                    'Count': row['Count']
-                })
+                key = (row['WaferID'], 'DMT')
+                if key not in tool_measurements:
+                    tool_measurements[key] = []
+                tool_measurements[key].append((row['Mean_Thickness'], row['Std_Thickness'], row['Count']))
             
-            # TFK statistics by wafer
+            # TFK statistics by wafer from DMT-TFK data
             tfk_stats = self.dmt_tfk_data.groupby('WaferID').agg({
                 'TFK_Thickness': ['mean', 'std', 'count']
             }).round(2)
@@ -167,16 +167,14 @@ class WaferMapAnalysis:
             tfk_stats = tfk_stats.reset_index()
             
             for _, row in tfk_stats.iterrows():
-                tool_data.append({
-                    'WaferID': row['WaferID'],
-                    'Tool': 'TFK',
-                    'Mean_Thickness': row['Mean_Thickness'],
-                    'Std_Thickness': row['Std_Thickness'],
-                    'Count': row['Count']
-                })
+                key = (row['WaferID'], 'TFK')
+                if key not in tool_measurements:
+                    tool_measurements[key] = []
+                tool_measurements[key].append((row['Mean_Thickness'], row['Std_Thickness'], row['Count']))
         
-        # Process BTM-DMT data for BTM statistics
+        # Process BTM-DMT data for both BTM and DMT statistics
         if self.btm_dmt_data is not None:
+            # BTM statistics by wafer from BTM-DMT data
             btm_stats = self.btm_dmt_data.groupby('WaferID').agg({
                 'BTM_Thickness': ['mean', 'std', 'count']
             }).round(2)
@@ -184,12 +182,78 @@ class WaferMapAnalysis:
             btm_stats = btm_stats.reset_index()
             
             for _, row in btm_stats.iterrows():
+                key = (row['WaferID'], 'BTM')
+                if key not in tool_measurements:
+                    tool_measurements[key] = []
+                tool_measurements[key].append((row['Mean_Thickness'], row['Std_Thickness'], row['Count']))
+            
+            # DMT statistics by wafer from BTM-DMT data
+            dmt_stats = self.btm_dmt_data.groupby('WaferID').agg({
+                'DMT_Thickness': ['mean', 'std', 'count']
+            }).round(2)
+            dmt_stats.columns = ['Mean_Thickness', 'Std_Thickness', 'Count']
+            dmt_stats = dmt_stats.reset_index()
+            
+            for _, row in dmt_stats.iterrows():
+                key = (row['WaferID'], 'DMT')
+                if key not in tool_measurements:
+                    tool_measurements[key] = []
+                tool_measurements[key].append((row['Mean_Thickness'], row['Std_Thickness'], row['Count']))
+        
+        # Process BTM-TFK data for both BTM and TFK statistics
+        if self.btm_tfk_data is not None:
+            # BTM statistics by wafer from BTM-TFK data
+            btm_stats = self.btm_tfk_data.groupby('WaferID').agg({
+                'BTM_Thickness': ['mean', 'std', 'count']
+            }).round(2)
+            btm_stats.columns = ['Mean_Thickness', 'Std_Thickness', 'Count']
+            btm_stats = btm_stats.reset_index()
+            
+            for _, row in btm_stats.iterrows():
+                key = (row['WaferID'], 'BTM')
+                if key not in tool_measurements:
+                    tool_measurements[key] = []
+                tool_measurements[key].append((row['Mean_Thickness'], row['Std_Thickness'], row['Count']))
+            
+            # TFK statistics by wafer from BTM-TFK data
+            tfk_stats = self.btm_tfk_data.groupby('WaferID').agg({
+                'TFK_Thickness': ['mean', 'std', 'count']
+            }).round(2)
+            tfk_stats.columns = ['Mean_Thickness', 'Std_Thickness', 'Count']
+            tfk_stats = tfk_stats.reset_index()
+            
+            for _, row in tfk_stats.iterrows():
+                key = (row['WaferID'], 'TFK')
+                if key not in tool_measurements:
+                    tool_measurements[key] = []
+                tool_measurements[key].append((row['Mean_Thickness'], row['Std_Thickness'], row['Count']))
+        
+        # Aggregate measurements for each tool-wafer combination
+        tool_data = []
+        for (wafer_id, tool), measurements in tool_measurements.items():
+            if len(measurements) == 1:
+                # Single measurement source
+                mean_thick, std_thick, count = measurements[0]
                 tool_data.append({
-                    'WaferID': row['WaferID'],
-                    'Tool': 'BTM',
-                    'Mean_Thickness': row['Mean_Thickness'],
-                    'Std_Thickness': row['Std_Thickness'],
-                    'Count': row['Count']
+                    'WaferID': wafer_id,
+                    'Tool': tool,
+                    'Mean_Thickness': mean_thick,
+                    'Std_Thickness': std_thick,
+                    'Count': count
+                })
+            else:
+                # Multiple measurement sources - combine using weighted average by count
+                total_count = sum(count for _, _, count in measurements)
+                weighted_mean = sum(mean_thick * count for mean_thick, _, count in measurements) / total_count
+                # Average the standard deviations (could use more sophisticated pooled std dev)
+                avg_std = sum(std_thick for _, std_thick, _ in measurements) / len(measurements)
+                
+                tool_data.append({
+                    'WaferID': wafer_id,
+                    'Tool': tool,
+                    'Mean_Thickness': round(weighted_mean, 2),
+                    'Std_Thickness': round(avg_std, 2),
+                    'Count': total_count
                 })
         
         self.tool_wafer_summary = pd.DataFrame(tool_data)

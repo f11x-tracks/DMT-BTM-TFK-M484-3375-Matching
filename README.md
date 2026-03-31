@@ -1,3 +1,5 @@
+** just run launch_dashboard.py and it will have a menu for other scripts
+
 run
 thickness_comparison_app - to create data used for other apps
 run 

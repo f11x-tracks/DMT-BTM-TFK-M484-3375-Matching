@@ -1,12 +1,12 @@
 BTM vs DMT Thickness Comparison Analysis
 ==================================================
 
-Total matched pairs: 248
-Unique wafers: 8
-Mean thickness delta (BTM - DMT): 24.751 ± 8.884 Å
-Median delta: 23.042 Å
-Delta range: 11.581 to 57.771 Å
-25th percentile: 18.898 Å
-75th percentile: 24.791 Å
+Total matched pairs: 496
+Unique wafers: 16
+Mean thickness delta (BTM - DMT): 1.793 ± 10.433 Å
+Median delta: 0.034 Å
+Delta range: -23.897 to 36.771 Å
+25th percentile: -3.254 Å
+75th percentile: 3.603 Å
 Mean matching distance: 1.379 mm
 Distance threshold used: 4.0 mm

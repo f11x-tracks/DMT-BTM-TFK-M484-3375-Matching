@@ -16,20 +16,24 @@ def show_menu():
     print("=" * 70)
     print()
     print("Available comparison types:")
-    print("1. DMT vs TFK Comparison (Original)")
-    print("2. BTM vs DMT Comparison (New)")
-    print("3. BTM vs TFK Comparison (New)")
-    print("4. Run All Comparisons")
-    print("5. Launch Dashboard (DMT vs TFK)")
-    print("6. Exit")
+    print("1. DMT vs TFK Comparison (Comprehensive - Original)")
+    print("2. DMT vs TFK Comparison (Focused - New)")
+    print("3. BTM vs DMT Comparison")
+    print("4. BTM vs TFK Comparison")
+    print("5. Generate Radial Analysis Plots")
+    print("6. Run All Comparisons")
+    print("7. Launch Dashboard (DMT vs TFK)")
+    print("8. Generate Contour Maps")
+    print("9. Exit")
     print()
-    return input("Select an option (1-6): ").strip()
+    return input("Select an option (1-9): ").strip()
 
 def run_comparison(comparison_type, script_dir):
     """Run a specific thickness comparison analysis"""
     
     comparison_scripts = {
-        'dmt_tfk': 'thickness_comparison_app.py',
+        'dmt_tfk_comprehensive': 'thickness_comparison_app.py',
+        'dmt_tfk_focused': 'dmt_tfk_comparison.py',
         'btm_dmt': 'btm_dmt_comparison.py', 
         'btm_tfk': 'btm_tfk_comparison.py'
     }
@@ -54,7 +58,8 @@ def run_comparison(comparison_type, script_dir):
     
     # Get comparison name for display
     comparison_names = {
-        'dmt_tfk': 'DMT vs TFK',
+        'dmt_tfk_comprehensive': 'DMT vs TFK (Comprehensive)',
+        'dmt_tfk_focused': 'DMT vs TFK (Focused)',
         'btm_dmt': 'BTM vs DMT',
         'btm_tfk': 'BTM vs TFK'
     }
@@ -132,6 +137,111 @@ def launch_dashboard(script_dir):
         print(f"Error starting dashboard: {e}")
         return 1
 
+def run_radial_analysis(script_dir):
+    """Run the radial analysis to generate HTML plots"""
+    
+    radial_script = script_dir / "wafer_map_analysis_radial.py"
+    
+    # Check if the script exists
+    if not radial_script.exists():
+        print(f"Error: Radial analysis script not found at {radial_script}")
+        return 1
+    
+    # Use the virtual environment Python executable
+    python_exe = script_dir / ".venv" / "Scripts" / "python.exe"
+    if not python_exe.exists():
+        # Fallback to sys.executable if venv not found
+        python_exe = sys.executable
+    
+    print("=" * 60)
+    print("RADIAL ANALYSIS - GENERATING HTML PLOTS")
+    print("=" * 60)
+    print()
+    print("This will generate interactive HTML radial plots for:")
+    print("• DMT vs TFK comparison (if data available)")
+    print("• BTM vs DMT comparison (if data available)")
+    print("• BTM vs TFK comparison (if data available)")
+    print()
+    print("Output files will be saved to output/ folder:")
+    print("• dmt_tfk_radial_plot.html")
+    print("• btm_dmt_radial_plot.html") 
+    print("• btm_tfk_radial_plot.html")
+    print("=" * 60)
+    
+    try:
+        result = subprocess.run([
+            str(python_exe),
+            str(radial_script)
+        ], cwd=script_dir)
+        
+        if result.returncode == 0:
+            print("\nRadial analysis completed successfully!")
+            print("Check the output/ folder for HTML plot files.")
+        else:
+            print(f"\nRadial analysis failed with return code {result.returncode}")
+        
+        return result.returncode
+        
+    except Exception as e:
+        print(f"Error running radial analysis: {e}")
+        return 1
+
+def run_contour_analysis(script_dir):
+    """Run the contour analysis to generate interactive contour maps"""
+    
+    contour_script = script_dir / "wafer_map_analysis_contour.py"
+    
+    # Check if the script exists
+    if not contour_script.exists():
+        print(f"Error: Contour analysis script not found at {contour_script}")
+        return 1
+    
+    # Use the virtual environment Python executable
+    python_exe = script_dir / ".venv" / "Scripts" / "python.exe"
+    if not python_exe.exists():
+        # Fallback to sys.executable if venv not found
+        python_exe = sys.executable
+    
+    print("=" * 60)
+    print("CONTOUR ANALYSIS - GENERATING INTERACTIVE CONTOUR MAPS")
+    print("=" * 60)
+    print()
+    print("This will generate interactive HTML contour maps for:")
+    print("• DMT vs TFK comparison (if data available)")
+    print("• BTM vs DMT comparison (if data available)")
+    print("• BTM vs TFK comparison (if data available)")
+    print()
+    print("Output files will be saved to output/ folder:")
+    print("• dmt_tfk_contour_map.html")
+    print("• btm_dmt_contour_map.html") 
+    print("• btm_tfk_contour_map.html")
+    print()
+    print("Features included:")
+    print("• 6-panel contour plot layout")
+    print("• Tool mean thickness contour maps")
+    print("• Delta distribution analysis")
+    print("• High delta location identification")
+    print("• Offset-corrected delta contour maps")
+    print("=" * 60)
+    
+    try:
+        result = subprocess.run([
+            str(python_exe),
+            str(contour_script)
+        ], cwd=script_dir)
+        
+        if result.returncode == 0:
+            print("\nContour analysis completed successfully!")
+            print("Check the output/ folder for HTML contour map files.")
+        else:
+            print(f"\nContour analysis failed with return code {result.returncode}")
+        
+        return result.returncode
+        
+    except Exception as e:
+        print(f"Error running contour analysis: {e}")
+        return 1
+
 def main():
     """Main program loop"""
     
@@ -142,25 +252,34 @@ def main():
         choice = show_menu()
         
         if choice == '1':
-            # DMT vs TFK comparison
-            result = run_comparison('dmt_tfk', script_dir)
+            # DMT vs TFK comparison (Comprehensive)
+            result = run_comparison('dmt_tfk_comprehensive', script_dir)
             if result == 0:
                 print("\nData file 'matched_thickness_data.csv' is ready for the dashboard.")
             
         elif choice == '2':
+            # DMT vs TFK comparison (Focused)
+            run_comparison('dmt_tfk_focused', script_dir)
+            
+        elif choice == '3':
             # BTM vs DMT comparison
             run_comparison('btm_dmt', script_dir)
             
-        elif choice == '3':
+        elif choice == '4':
             # BTM vs TFK comparison 
             run_comparison('btm_tfk', script_dir)
             
-        elif choice == '4':
+        elif choice == '5':
+            # Generate radial analysis plots
+            run_radial_analysis(script_dir)
+            
+        elif choice == '6':
             # Run all comparisons
             print("\nRunning all thickness comparisons...")
             print("=" * 50)
             
-            comparisons = [('dmt_tfk', 'DMT vs TFK'), 
+            comparisons = [('dmt_tfk_comprehensive', 'DMT vs TFK (Comprehensive)'), 
+                          ('dmt_tfk_focused', 'DMT vs TFK (Focused)'),
                           ('btm_dmt', 'BTM vs DMT'), 
                           ('btm_tfk', 'BTM vs TFK')]
             
@@ -174,20 +293,26 @@ def main():
                     
             if all_successful:
                 print("\nAll comparisons completed successfully!")
+                print("Running radial analysis to generate HTML plots...")
+                run_radial_analysis(script_dir)
             else:
                 print("\nSome comparisons failed. Check the output above.")
                 
-        elif choice == '5':
+        elif choice == '7':
             # Launch dashboard
             return launch_dashboard(script_dir)
             
-        elif choice == '6':
+        elif choice == '8':
+            # Generate contour maps
+            run_contour_analysis(script_dir)
+            
+        elif choice == '9':
             # Exit
             print("Goodbye!")
             return 0
             
         else:
-            print("Invalid choice. Please select 1-6.")
+            print("Invalid choice. Please select 1-9.")
         
         # Ask if user wants to continue
         print("\n" + "-" * 50)

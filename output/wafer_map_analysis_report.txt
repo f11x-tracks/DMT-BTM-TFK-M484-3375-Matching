@@ -6,8 +6,8 @@ DATASET OVERVIEW:
 ----------------------------------------
 DMT-TFK Comparisons: 248 matched pairs
   Wafers: AANBD159TED5, AANBD160TEG6, AANBD182TEC1, AANBD183TEG3, AANBD202TEC1, AANBD204TED2, AANBD216TEB4, AANBD252TEC4
-BTM-DMT Comparisons: 248 matched pairs
-  Wafers: AANBD159TED5, AANBD160TEG6, AANBD182TEC1, AANBD183TEG3, AANBD202TEC1, AANBD204TED2, AANBD216TEB4, AANBD252TEC4
+BTM-DMT Comparisons: 496 matched pairs
+  Wafers: AANBD159TED5, AANBD160TEG6, AANBD182TEC1, AANBD183TEG3, AANBD202TEC1, AANBD204TED2, AANBD216TEB4, AANBD252TEC4, AHJYE733TMA3, GD2SM303JKA0, GD2SM325JKC6, GD2SM381JKF3, GD7LB587JKG0, GD7LB589JKH1, GD7LB591JKH1, WMCTE191ESB7
 BTM-TFK Comparisons: 256 matched pairs
   Wafers: AANBD159TED5, AANBD160TEG6, AANBD182TEC1, AANBD183TEG3, AANBD202TEC1, AANBD204TED2, AANBD216TEB4, AANBD252TEC4
 
@@ -23,11 +23,11 @@ DMT-TFK - Top 5 Highest Delta Locations:
   (  57.0, -135.0) mm:   -44.0 ±   4.2 Å
 
 BTM-DMT - Top 5 Highest Delta Locations:
-  (-136.2,   57.9) mm:    44.7 ±   6.2 Å
-  (-136.2,  -57.9) mm:    43.9 ±   4.4 Å
-  ( -57.9, -136.2) mm:    43.0 ±   5.1 Å
-  ( -57.9,  136.2) mm:    42.5 ±   6.0 Å
-  (  57.9, -136.2) mm:    41.5 ±   5.2 Å
+  (-136.2,   57.9) mm:    43.3 ±   4.7 Å
+  (-136.2,  -57.9) mm:    42.9 ±   3.5 Å
+  ( -57.9, -136.2) mm:    42.5 ±   4.0 Å
+  (  57.9, -136.2) mm:    42.2 ±   4.2 Å
+  ( -57.9,  136.2) mm:    42.0 ±   4.5 Å
 
 BTM-TFK - Top 5 Highest Delta Locations:
   ( 141.9,  -35.9) mm:    -9.1 ±   9.0 Å
@@ -40,33 +40,49 @@ TOOL STATISTICS BY WAFER:
 ----------------------------------------
 
 BTM Tool:
-  AANBD159TED5:  3355.3 ±   7.5 Å (31 points)
-  AANBD160TEG6:  3355.8 ±   7.5 Å (31 points)
-  AANBD182TEC1:  3371.4 ±  12.4 Å (31 points)
-  AANBD183TEG3:  3381.7 ±   7.6 Å (31 points)
-  AANBD202TEC1:  3367.5 ±  12.1 Å (31 points)
-  AANBD204TED2:  3379.7 ±   7.3 Å (31 points)
-  AANBD216TEB4:  3381.1 ±   7.6 Å (31 points)
-  AANBD252TEC4:  3378.6 ±   7.4 Å (31 points)
+  AANBD159TED5:  3355.4 ±   7.6 Å (63 points)
+  AANBD160TEG6:  3356.0 ±   7.5 Å (63 points)
+  AANBD182TEC1:  3371.8 ±  12.6 Å (63 points)
+  AANBD183TEG3:  3381.8 ±   7.6 Å (63 points)
+  AANBD202TEC1:  3367.9 ±  12.4 Å (63 points)
+  AANBD204TED2:  3379.8 ±   7.3 Å (63 points)
+  AANBD216TEB4:  3381.2 ±   7.6 Å (63 points)
+  AANBD252TEC4:  3378.7 ±   7.4 Å (63 points)
+  AHJYE733TMA3:  3389.1 ±  11.1 Å (31 points)
+  GD2SM303JKA0:  3368.0 ±  23.7 Å (31 points)
+  GD2SM325JKC6:  3380.7 ±  10.6 Å (31 points)
+  GD2SM381JKF3:  3385.6 ±  11.6 Å (31 points)
+  GD7LB587JKG0:  3379.1 ±  11.0 Å (31 points)
+  GD7LB589JKH1:  3368.9 ±  21.3 Å (31 points)
+  GD7LB591JKH1:  3370.3 ±  18.6 Å (31 points)
+  WMCTE191ESB7:  3369.3 ±  20.9 Å (31 points)
 
 DMT Tool:
-  AANBD159TED5:  3334.2 ±   5.8 Å (31 points)
-  AANBD160TEG6:  3334.1 ±   6.6 Å (31 points)
-  AANBD182TEC1:  3346.3 ±   5.5 Å (31 points)
-  AANBD183TEG3:  3354.7 ±   6.9 Å (31 points)
-  AANBD202TEC1:  3344.1 ±   5.6 Å (31 points)
-  AANBD204TED2:  3353.2 ±   8.0 Å (31 points)
-  AANBD216TEB4:  3354.4 ±   7.5 Å (31 points)
-  AANBD252TEC4:  3352.1 ±   8.4 Å (31 points)
+  AANBD159TED5:  3334.2 ±   5.8 Å (62 points)
+  AANBD160TEG6:  3334.1 ±   6.6 Å (62 points)
+  AANBD182TEC1:  3346.3 ±   5.5 Å (62 points)
+  AANBD183TEG3:  3354.7 ±   6.9 Å (62 points)
+  AANBD202TEC1:  3344.1 ±   5.6 Å (62 points)
+  AANBD204TED2:  3353.2 ±   8.0 Å (62 points)
+  AANBD216TEB4:  3354.4 ±   7.5 Å (62 points)
+  AANBD252TEC4:  3352.1 ±   8.4 Å (62 points)
+  AHJYE733TMA3:  3364.3 ±   9.0 Å (31 points)
+  GD2SM303JKA0:  3347.3 ±  15.6 Å (31 points)
+  GD2SM325JKC6:  3356.4 ±  10.1 Å (31 points)
+  GD2SM381JKF3:  3364.0 ±  10.7 Å (31 points)
+  GD7LB587JKG0:  3355.9 ±  10.8 Å (31 points)
+  GD7LB589JKH1:  3351.9 ±  13.5 Å (31 points)
+  GD7LB591JKH1:  3352.5 ±  10.8 Å (31 points)
+  WMCTE191ESB7:  3351.9 ±  12.9 Å (31 points)
 
 TFK Tool:
-  AANBD159TED5:  3366.3 ±   8.1 Å (31 points)
-  AANBD160TEG6:  3367.1 ±   8.3 Å (31 points)
-  AANBD182TEC1:  3380.4 ±   7.9 Å (31 points)
-  AANBD183TEG3:  3379.7 ±   7.7 Å (31 points)
-  AANBD202TEC1:  3378.0 ±   8.3 Å (31 points)
-  AANBD204TED2:  3377.7 ±   7.0 Å (31 points)
-  AANBD216TEB4:  3379.0 ±   7.7 Å (31 points)
-  AANBD252TEC4:  3376.9 ±   7.5 Å (31 points)
+  AANBD159TED5:  3366.6 ±   8.2 Å (63 points)
+  AANBD160TEG6:  3367.3 ±   8.3 Å (63 points)
+  AANBD182TEC1:  3380.7 ±   8.1 Å (63 points)
+  AANBD183TEG3:  3379.8 ±   7.7 Å (63 points)
+  AANBD202TEC1:  3378.3 ±   8.5 Å (63 points)
+  AANBD204TED2:  3377.8 ±   6.9 Å (63 points)
+  AANBD216TEB4:  3379.1 ±   7.7 Å (63 points)
+  AANBD252TEC4:  3377.1 ±   7.5 Å (63 points)
 
 ================================================================================

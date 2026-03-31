@@ -221,10 +221,22 @@ class BTMTFKComparisonApp:
                    alpha=0.6, s=20)
         min_thick = min(self.matched_data['TFK_Thickness'].min(), self.matched_data['BTM_Thickness'].min())
         max_thick = max(self.matched_data['TFK_Thickness'].max(), self.matched_data['BTM_Thickness'].max())
-        ax1.plot([min_thick, max_thick], [min_thick, max_thick], 'r--', alpha=0.8)
+        
+        # Linear correlation line instead of 1:1
+        x = self.matched_data['TFK_Thickness'].values
+        y = self.matched_data['BTM_Thickness'].values
+        coeffs = np.polyfit(x, y, 1)
+        correlation_coeff = np.corrcoef(x, y)[0, 1]
+        r_squared = correlation_coeff**2
+        
+        x_line = np.linspace(min_thick, max_thick, 100)
+        y_line = np.polyval(coeffs, x_line)
+        ax1.plot(x_line, y_line, 'r--', alpha=0.8, label='Linear Fit')
+        
         ax1.set_xlabel('TFK Thickness (Å)')
         ax1.set_ylabel('BTM Thickness (Å)')
         ax1.set_title('BTM vs TFK Thickness Correlation')
+        ax1.legend()
         ax1.grid(True, alpha=0.3)
         
         # Thickness Delta histogram

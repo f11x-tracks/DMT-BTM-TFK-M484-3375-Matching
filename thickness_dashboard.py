@@ -36,14 +36,6 @@ mean_delta = df['Thickness_Delta'].mean()
 mean_abs_delta = abs(mean_delta)
 df['DMT_Adjusted'] = df['DMT_Thickness'] + mean_abs_delta
 
-# Calculate radius from center (0,0) for radial analysis
-df['Radius_mm'] = np.sqrt(df['TFK_X_mm']**2 + df['TFK_Y_mm']**2)
-
-# Calculate mean delta and adjust DMT thickness
-mean_delta = df['Thickness_Delta'].mean()
-mean_abs_delta = abs(mean_delta)
-df['DMT_Adjusted'] = df['DMT_Thickness'] + mean_abs_delta
-
 # Calculate summary statistics
 wafer_stats = df.groupby('WaferID').agg({
     'DMT_Thickness': ['mean', 'std', 'count'],

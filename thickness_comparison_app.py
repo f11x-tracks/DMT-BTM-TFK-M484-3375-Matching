@@ -170,6 +170,32 @@ class ThicknessComparisonApp:
         
         self.matched_data = pd.DataFrame(matched_pairs)
         print(f"\nTotal matched measurement pairs: {len(self.matched_data)}")
+        
+        # Apply radial adjustment to DMT thickness data (add 20 to points > 146mm radius)
+        if len(self.matched_data) > 0:
+            print("\nApplying radial adjustment to DMT thickness data...")
+            
+            # Calculate radius from center (0,0) for each DMT measurement point 
+            dmt_radius = np.sqrt(self.matched_data['DMT_X_mm']**2 + self.matched_data['DMT_Y_mm']**2)
+            
+            # Find points with radius > 146mm
+            radius_mask = dmt_radius > 146.0
+            num_adjusted = radius_mask.sum()
+            
+            if num_adjusted > 0:
+                # Add 20 Å to DMT thickness for points > 146mm radius
+                self.matched_data.loc[radius_mask, 'DMT_Thickness'] += 20.0
+                
+                # Recalculate thickness delta with adjusted DMT values
+                self.matched_data['Thickness_Delta'] = (self.matched_data['DMT_Thickness'] - 
+                                                       self.matched_data['TFK_Thickness'])
+                
+                print(f"  Adjusted {num_adjusted} DMT thickness points (radius > 146mm) by +20 Å")
+                print(f"  Radius range of adjusted points: {dmt_radius[radius_mask].min():.1f} - {dmt_radius[radius_mask].max():.1f} mm")
+            else:
+                print("  No DMT thickness points found with radius > 146mm")
+                
+        print(f"Radial adjustment complete.")
     
     def analyze_thickness_differences(self):
         """Analyze thickness differences between matched points"""
@@ -275,7 +301,21 @@ class ThicknessComparisonApp:
                          alpha=0.6, s=30)
         min_val = min(self.matched_data['TFK_Thickness'].min(), self.matched_data['DMT_Thickness'].min())
         max_val = max(self.matched_data['TFK_Thickness'].max(), self.matched_data['DMT_Thickness'].max())
-        axes[0,1].plot([min_val, max_val], [min_val, max_val], 'r--', label='1:1 Line')
+        
+        # Linear correlation line instead of 1:1
+        x = self.matched_data['TFK_Thickness'].values
+        y = self.matched_data['DMT_Thickness'].values
+        
+        # Calculate linear regression
+        coeffs = np.polyfit(x, y, 1)
+        correlation_coeff = np.corrcoef(x, y)[0, 1]
+        r_squared = correlation_coeff**2
+        
+        # Plot linear regression line
+        x_line = np.linspace(min_val, max_val, 100)
+        y_line = np.polyval(coeffs, x_line)
+        axes[0,1].plot(x_line, y_line, 'r--', label='Linear Fit')
+        
         axes[0,1].set_xlabel('TFK Thickness [Å]')
         axes[0,1].set_ylabel('DMT Thickness [Å]')
         axes[0,1].set_title('DMT vs TFK Thickness Correlation')
@@ -531,11 +571,12 @@ class ThicknessComparisonApp:
         
         plt.tight_layout()
         
-        # Save the plot
-        plot_path = os.path.join(output_dir, 'averaged_wafer_map.png')
-        plt.savefig(plot_path, dpi=300, bbox_inches='tight')
-        print(f"Averaged wafer map saved to: {plot_path}")
-        plt.show()
+        # Save the plot - DISABLED for performance
+        # plot_path = os.path.join(output_dir, 'averaged_wafer_map.png')
+        # plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+        # print(f"Averaged wafer map saved to: {plot_path}")
+        # plt.show()
+        plt.close()  # Close the figure to free memory
         
         # Store results for ranking
         self.wafer_map_results = {
@@ -938,11 +979,11 @@ class ThicknessComparisonApp:
             # Create visualizations
             self.create_visualizations()
             
-            # Create spatial delta visualization
-            self.create_spatial_delta_plot()
+            # Create spatial delta visualization (DISABLED - PNG output turned off)
+            # self.create_spatial_delta_plot()
             
-            # Create averaged wafer map
-            self.create_averaged_wafer_map()
+            # Create averaged wafer map (DISABLED - PNG output turned off)
+            # self.create_averaged_wafer_map()
             
             # Create location ranking
             self.create_location_ranking()
@@ -950,14 +991,14 @@ class ThicknessComparisonApp:
             # Create enhanced summary
             self.create_enhanced_summary()
             
-            # Create new trend plots
-            self.create_thickness_trend_plots()
+            # Create new trend plots (DISABLED - PNG output turned off)
+            # self.create_thickness_trend_plots()
             
-            # Create standard deviation trend plots
-            self.create_std_dev_trend_plots()
+            # Create standard deviation trend plots (DISABLED - PNG output turned off)
+            # self.create_std_dev_trend_plots()
             
-            # Create spline plots
-            self.create_spline_plots()
+            # Create spline plots (DISABLED - PNG output turned off)
+            # self.create_spline_plots()
             
             # Save results
             self.save_results()
@@ -1354,8 +1395,8 @@ def create_spatial_plot_from_data(csv_file_path=None):
     app = ThicknessComparisonApp("", "")  # Empty folders since we're loading from CSV
     app.matched_data = matched_data
     
-    # Create the spatial plot
-    app.create_spatial_delta_plot()
+    # Create the spatial plot (DISABLED - PNG output turned off)
+    # app.create_spatial_delta_plot()
 
 def create_summary_and_ranking_from_data(csv_file_path=None, output_dir=None):
     """Create wafer map, ranking, and enhanced summary from existing matched data CSV"""
@@ -1380,8 +1421,8 @@ def create_summary_and_ranking_from_data(csv_file_path=None, output_dir=None):
     app.matched_data = matched_data
     
     # Create all the new visualizations and analyses
-    print("\nGenerating averaged wafer map...")
-    app.create_averaged_wafer_map(output_dir)
+    # print("\nGenerating averaged wafer map...")  # DISABLED - PNG output turned off
+    # app.create_averaged_wafer_map(output_dir)
     
     print("\nGenerating location ranking...")
     rankings = app.create_location_ranking(output_dir)
@@ -1389,14 +1430,14 @@ def create_summary_and_ranking_from_data(csv_file_path=None, output_dir=None):
     print("\nGenerating enhanced summary...")
     summary_file = app.create_enhanced_summary(output_dir)
     
-    print("\nGenerating thickness trend plots...")
-    app.create_thickness_trend_plots(output_dir)
+    # print("\nGenerating thickness trend plots...")  # DISABLED - PNG output turned off
+    # app.create_thickness_trend_plots(output_dir)
     
-    print("\nGenerating standard deviation trend plots...")
-    app.create_std_dev_trend_plots(output_dir)
+    # print("\nGenerating standard deviation trend plots...")  # DISABLED - PNG output turned off
+    # app.create_std_dev_trend_plots(output_dir)
     
-    print("\nGenerating radial spline plots...")
-    app.create_spline_plots(output_dir)
+    # print("\nGenerating radial spline plots...")  # DISABLED - PNG output turned off
+    # app.create_spline_plots(output_dir)
     
     print(f"\n{'='*60}")
     print("SUMMARY AND RANKING ANALYSIS COMPLETE!")

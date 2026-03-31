@@ -32,9 +32,14 @@ class WaferMapAnalysisRadial:
         # Load DMT-TFK comparison (main matched data)
         try:
             self.dmt_tfk_data = pd.read_csv('output/matched_thickness_data.csv')
-            print(f"Loaded {len(self.dmt_tfk_data)} DMT-TFK matched pairs")
+            print(f"Loaded {len(self.dmt_tfk_data)} DMT-TFK matched pairs (comprehensive)")
         except FileNotFoundError:
-            print("Warning: output/matched_thickness_data.csv not found")
+            try:
+                # Try the focused comparison output
+                self.dmt_tfk_data = pd.read_csv('dmt_tfk_comparison_results/dmt_tfk_matched_data.csv')
+                print(f"Loaded {len(self.dmt_tfk_data)} DMT-TFK matched pairs (focused)")
+            except FileNotFoundError:
+                print("Warning: No DMT-TFK data found (checked both comprehensive and focused outputs)")
             
         # Load BTM-DMT comparison
         try:
@@ -315,7 +320,7 @@ class WaferMapAnalysisRadial:
                 f'{tool1_name} Thickness vs Radius',
                 f'{tool2_name} Thickness vs Radius',
                 f'{title_prefix} Delta Distribution',
-                f'Absolute Delta vs Radius',
+                f'Raw Delta vs Radius',
                 f'Offset-Corrected Delta vs Radius',
                 f'Radial Statistics Summary'
             ),
@@ -348,7 +353,7 @@ class WaferMapAnalysisRadial:
                 x=tool1_radius,
                 y=data[tool1_col],
                 mode='markers',
-                marker=dict(size=4, color='lightblue', opacity=0.6),
+                marker=dict(size=4, color='black', opacity=0.7),
                 name=f'{tool1_name} Raw Data',
                 hovertemplate=f'<b>{tool1_name} Raw Data</b><br>' +
                              'Radius: %{x:.1f} mm<br>' +
@@ -358,18 +363,17 @@ class WaferMapAnalysisRadial:
             row=1, col=1
         )
         
-        # Add binned averages with error bars
+        # Add binned averages without error bars
         fig.add_trace(
             go.Scatter(
                 x=bin_centers_1,
                 y=bin_means_1,
-                error_y=dict(type='data', array=bin_stds_1, visible=True),
                 mode='markers',
                 marker=dict(size=8, color='darkblue', symbol='diamond'),
                 name=f'{tool1_name} Binned Avg',
                 hovertemplate=f'<b>{tool1_name} Binned Average</b><br>' +
                              'Radius: %{x:.1f} mm<br>' +
-                             f'{tool1_name} Thickness: %{{y:.1f}} ± %{{error_y.array:.1f}} Å<br>' +
+                             f'{tool1_name} Thickness: %{{y:.1f}} Å<br>' +
                              'Points: %{customdata}<extra></extra>',
                 customdata=bin_counts_1,
                 showlegend=True
@@ -419,7 +423,7 @@ class WaferMapAnalysisRadial:
                 x=tool2_radius,
                 y=data[tool2_col],
                 mode='markers',
-                marker=dict(size=4, color='lightcoral', opacity=0.6),
+                marker=dict(size=4, color='black', opacity=0.7),
                 name=f'{tool2_name} Raw Data',
                 hovertemplate=f'<b>{tool2_name} Raw Data</b><br>' +
                              'Radius: %{x:.1f} mm<br>' +
@@ -429,18 +433,17 @@ class WaferMapAnalysisRadial:
             row=1, col=2
         )
         
-        # Add binned averages with error bars
+        # Add binned averages without error bars
         fig.add_trace(
             go.Scatter(
                 x=bin_centers_2,
                 y=bin_means_2,
-                error_y=dict(type='data', array=bin_stds_2, visible=True),
                 mode='markers',
                 marker=dict(size=8, color='darkred', symbol='diamond'),
                 name=f'{tool2_name} Binned Avg',
                 hovertemplate=f'<b>{tool2_name} Binned Average</b><br>' +
                              'Radius: %{x:.1f} mm<br>' +
-                             f'{tool2_name} Thickness: %{{y:.1f}} ± %{{error_y.array:.1f}} Å<br>' +
+                             f'{tool2_name} Thickness: %{{y:.1f}} Å<br>' +
                              'Points: %{customdata}<extra></extra>',
                 customdata=bin_counts_2,
                 showlegend=False
@@ -478,28 +481,28 @@ class WaferMapAnalysisRadial:
             row=1, col=3
         )
         
-        # Plot 4: Absolute delta vs radius
+        # Plot 4: Raw delta vs radius
         bin_centers_abs, bin_means_abs, bin_stds_abs, bin_counts_abs = self.create_radial_bins(
-            data['Radius_mm'], data['Abs_Delta']
+            data['Radius_mm'], data['Thickness_Delta']
         )
         
-        # Raw absolute delta vs radius
+        # Raw delta vs radius
         fig.add_trace(
             go.Scatter(
                 x=data['Radius_mm'],
-                y=data['Abs_Delta'],
+                y=data['Thickness_Delta'],
                 mode='markers',
                 marker=dict(size=4, color='orange', opacity=0.6),
-                name='Abs Delta Raw',
-                hovertemplate='<b>Absolute Delta</b><br>' +
+                name='Raw Delta',
+                hovertemplate='<b>Raw Delta</b><br>' +
                              'Radius: %{x:.1f} mm<br>' +
-                             'Abs Delta: %{y:.1f} Å<extra></extra>',
+                             'Raw Delta: %{y:.1f} Å<extra></extra>',
                 showlegend=False
             ),
             row=2, col=1
         )
         
-        # Binned absolute delta
+        # Binned raw delta
         fig.add_trace(
             go.Scatter(
                 x=bin_centers_abs,
@@ -508,10 +511,10 @@ class WaferMapAnalysisRadial:
                 mode='markers+lines',
                 marker=dict(size=8, color='darkorange', symbol='diamond'),
                 line=dict(color='darkorange', width=2),
-                name='Abs Delta Binned',
-                hovertemplate='<b>Binned Absolute Delta</b><br>' +
+                name='Raw Delta Binned',
+                hovertemplate='<b>Binned Raw Delta</b><br>' +
                              'Radius: %{x:.1f} mm<br>' +
-                             'Abs Delta: %{y:.1f} ± %{error_y.array:.1f} Å<br>' +
+                             'Raw Delta: %{y:.1f} ± %{error_y.array:.1f} Å<br>' +
                              'Points: %{customdata}<extra></extra>',
                 customdata=bin_counts_abs,
                 showlegend=False

@@ -1,7 +1,7 @@
 ENHANCED THICKNESS COMPARISON ANALYSIS SUMMARY
 ============================================================
 
-Generated on: 2026-03-27 12:57:33
+Generated on: 2026-03-30 14:53:07
 Analysis Date: March 26, 2026
 
 BASIC STATISTICS
@@ -10,17 +10,17 @@ Total matched measurement pairs: 248
 Unique wafers analyzed: 8
 Wafer IDs: AANBD159TED5, AANBD160TEG6, AANBD182TEC1, AANBD183TEG3, AANBD202TEC1, AANBD204TED2, AANBD216TEB4, AANBD252TEC4
 
-Mean thickness difference (DMT - TFK): -29.010 ± 9.221 Å
-Median thickness difference: -27.945 Å
-Range: -58.421 to -13.716 Å
-95% of differences within: ±18.073 Å
+Mean thickness difference (DMT - TFK): -25.785 ± 4.848 Å
+Median thickness difference: -25.963 Å
+Range: -38.421 to -13.716 Å
+95% of differences within: ±9.501 Å
 
 TOOL COMPARISON
 ------------------------------
-DMT Tool - Mean: 3346.636 Å, Std: 10.538 Å
+DMT Tool - Mean: 3349.862 Å, Std: 11.099 Å
 TFK Tool - Mean: 3375.646 Å, Std: 9.335 Å
-Tool bias (DMT - TFK): -29.010 Å
-Precision difference (DMT std - TFK std): 1.204 Å
+Tool bias (DMT - TFK): -25.785 Å
+Precision difference (DMT std - TFK std): 1.764 Å
 
 COORDINATE MATCHING QUALITY
 ------------------------------
@@ -37,8 +37,8 @@ Spatial coverage: X=[-135.6, 141.7]mm, Y=[-135.6, 135.6]mm
 
 KEY FINDINGS
 ------------------------------
-⚠ Systematic bias detected: TFK reads higher by 29.0 Å
+⚠ Systematic bias detected: TFK reads higher by 25.8 Å
 ✓ Good precision matching between tools
 ✓ Good relative precision
 
-Coefficient of variation: 31.8%
+Coefficient of variation: 18.8%
